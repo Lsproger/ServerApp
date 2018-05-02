@@ -33,20 +33,3 @@
 #     sock.close()
 #
 #
-
-connections = ['conn1', 'conn2', 'conn3']
-
-def closeconn(connname):
-    print('Closing')
-    for c in connections:
-        if c == connname:
-            connections.remove(c)
-
-
-print(connections)
-
-closeconn('conn2')
-
-print(connections)
-
-

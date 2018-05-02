@@ -8,7 +8,7 @@ import collections
 client_listeners = []
 connections = []
 port = 9090
-ClientListener = collections.namedtuple('ClientListener', ['username', 'address', 'port'])
+ClientListener = collections.namedtuple('ClientListener', ['username', 'addr', 'port'])
 
 
 def GetKey(conn: socket, addr, username):
@@ -41,6 +41,17 @@ def SaveKey(conn: socket, addr, username):
 
 def DiffieHellman(conn: socket, addr, username):
     print('DiffieHellman service started')
+    client_name = conn.recv(1024).decode(encoding='utf-8')
+    client = None
+    for c in client_listeners:
+        if c.username == client_name:
+            client = c
+            break
+    if client is not None:
+        caddr_port = client.addr + ' ' + client.port
+        conn.send(bytes(caddr_port, 'utf-8'))
+    else:
+        conn.send(b'Not connected')
 
 
 def Disconnect(conn: socket, addr, username):
@@ -58,7 +69,9 @@ def RegisterListener(conn: socket, addr, username):
     print('RegisterListener service started')
     listener_port = conn.recv(1024).decode(encoding='utf-8')
     client_listeners.append(ClientListener(username, addr[0], listener_port))
-
+    conn.send(b'OK')
+    print(client_listeners)
+    print(connections)
 
 
 services = {'SAVE_KEY': SaveKey,
@@ -77,7 +90,7 @@ def DispatchServer(conn: socket, addr, username):
 
 
 def StartService(conn: socket, addr, username):
-    # try:
+    # try:exit
     service = conn.recv(1024)
     print(service)
     isOK = False
