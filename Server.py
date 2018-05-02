@@ -46,6 +46,7 @@ def DiffieHellman(conn: socket, addr, username):
     for c in client_listeners:
         if c.username == client_name:
             client = c
+            print(client)
             break
     if client is not None:
         caddr_port = str(client.addr) + ' ' + str(client.port)
@@ -82,13 +83,6 @@ services = {'SAVE_KEY': SaveKey,
             'REGISTER_LISTENER': RegisterListener}
 
 
-def DispatchServer(conn: socket, addr, username):
-    print('Dispatch started:', addr)
-    conn.send(b'OK')
-    while conn is not None:
-        StartService(conn, addr, username)
-
-
 def StartService(conn: socket, addr, username):
     # try:exit
     service = conn.recv(1024)
@@ -104,8 +98,12 @@ def StartService(conn: socket, addr, username):
             break
     if not isOK:
         conn.send(b'No such service')
-    # except BrokenPipeError as e:
-    #     Disconnect(conn, addr, username)
+
+
+def DispatchServer(conn: socket, addr, username):
+    print('Dispatch started:', addr)
+    while conn is not None:
+        StartService(conn, addr, username)
 
 
 def AcceptServer(sock: socket, command):
@@ -114,6 +112,7 @@ def AcceptServer(sock: socket, command):
             print('Accept')
             conn, addr = sock.accept()
             username = conn.recv(1024).decode(encoding='utf-8')
+            conn.send(b'OK')
             connections.append(Connection(conn, addr, username))
             print('Client connected:\n\taddress: ', addr, '\n\tUsername: ', username)
             threading.Thread(target=DispatchServer, args=(conn, addr, username)).start()
