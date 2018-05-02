@@ -48,10 +48,10 @@ def DiffieHellman(conn: socket, addr, username):
             client = c
             break
     if client is not None:
-        caddr_port = client.addr + ' ' + client.port
+        caddr_port = str(client.addr) + ' ' + str(client.port)
         conn.send(bytes(caddr_port, 'utf-8'))
     else:
-        conn.send(b'Not connected')
+        conn.send(b'Fail')
 
 
 def Disconnect(conn: socket, addr, username):
