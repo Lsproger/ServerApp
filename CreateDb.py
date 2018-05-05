@@ -22,8 +22,12 @@ c = conn.cursor()
 # c.execute('create table MESSAGES (to_username text, from_username text, message text)')
 #
 #
-# c.execute("SELECT * FROM OPEN_KEYS")
-# print(c.fetchall())
+
+c.execute("SELECT * FROM OPEN_KEYS")
+a = 0
+while a < 20:
+    print(c.fetchone())
+    a = a + 1
 # c.execute("insert into OPEN_KEYS values('Anton', 1337, 1488)")
 # conn.commit()
 

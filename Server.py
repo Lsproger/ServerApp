@@ -17,7 +17,7 @@ def GetKey(conn: socket, addr, username):
 
     dbconn = sqlite3.connect('ServerStorage.db')
     cur = dbconn.cursor()
-    cur.execute("select openkey_x , openkey_y from OPEN_KEYS where username =  ?", [(username)])
+    cur.execute("select openkey_x , openkey_y from OPEN_KEYS where username =  ?", [(usr)])
     key = cur.fetchone()
     print(key)
     if key is not None:
