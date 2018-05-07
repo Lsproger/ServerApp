@@ -21,7 +21,7 @@ def GetKey(conn: socket, addr, username):
     key = cur.fetchone()
     print(key)
     if key is not None:
-        key = key[0] + ' ' + key[1]
+        key = key[0] + ';' + key[1]
         conn.send(bytes(key, 'utf-8'))
     else:
         conn.send(bytes('0 0', 'utf-8'))
@@ -30,7 +30,7 @@ def GetKey(conn: socket, addr, username):
 def SaveKey(conn: socket, addr, username):
     print('SaveKey service started')
     key_string = conn.recv(1024).decode(encoding='utf-8')
-    key = str(key_string).split(' ')
+    key = str(key_string).split(';')
     print(key)
     dbconn = sqlite3.connect('ServerStorage.db')
     cur = dbconn.cursor()
@@ -49,7 +49,7 @@ def DiffieHellman(conn: socket, addr, username):
             print(client)
             break
     if client is not None:
-        caddr_port = str(client.addr) + ' ' + str(client.port)
+        caddr_port = str(client.addr) + ';' + str(client.port)
         conn.send(bytes(caddr_port, 'utf-8'))
     else:
         conn.send(b'Fail')
@@ -63,13 +63,26 @@ def Disconnect(conn: socket, addr, username):
 
 
 def PSEC_KEM(conn: socket, addr, username):
-    return 0
+    print('PSEC_KEM service started')
+    client_name = conn.recv(1024).decode(encoding='utf-8')
+    client = None
+    for c in client_listeners:
+        if c.username == client_name:
+            client = c
+            print(client)
+            break
+    if client is not None:
+        caddr_port = str(client.addr) + ';' + str(client.port)
+        conn.send(bytes(caddr_port, 'utf-8'))
+    else:
+        conn.send(b'Fail')
 
 
 def RegisterListener(conn: socket, addr, username):
     print('RegisterListener service started')
     listener_port = conn.recv(1024).decode(encoding='utf-8')
-    client_listeners.append(ClientListener(username, addr[0], listener_port))
+    client_listener = ClientListener(username, addr[0], listener_port)
+    client_listeners.append(client_listener)
     conn.send(b'OK')
     print(client_listeners)
     print(connections)
@@ -84,7 +97,7 @@ services = {'SAVE_KEY': SaveKey,
 
 
 def StartService(conn: socket, addr, username):
-    # try:exit
+    # try:
     service = conn.recv(1024)
     print(service)
     isOK = False
@@ -98,6 +111,9 @@ def StartService(conn: socket, addr, username):
             break
     if not isOK:
         conn.send(b'No such service')
+    # except:
+    #     print('Client connection is razorvano')
+    # TODO: delete listener from list
 
 
 def DispatchServer(conn: socket, addr, username):
