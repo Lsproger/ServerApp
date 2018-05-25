@@ -97,23 +97,23 @@ services = {'SAVE_KEY': SaveKey,
 
 
 def StartService(conn: socket, addr, username):
-    # try:
-    service = conn.recv(1024)
-    print(service)
-    isOK = False
-    for s in services.keys():
-        if service.decode(encoding='utf-8') == s:
-            conn.send(bytes(s, 'utf-8'))
-            t = threading.Thread(target=services[s], args=(conn, addr, username))
-            t.start()
-            t.join()
-            isOK = True
-            break
-    if not isOK:
-        conn.send(b'No such service')
-    # except:
-    #     print('Client connection is razorvano')
-    # TODO: delete listener from list
+    #try:
+        service = conn.recv(1024)
+        print(service)
+        isOK = False
+        for s in services.keys():
+            if service.decode(encoding='utf-8') == s:
+                conn.send(bytes(s, 'utf-8'))
+                t = threading.Thread(target=services[s], args=(conn, addr, username))
+                t.start()
+                t.join()
+                isOK = True
+                break
+        if not isOK:
+            conn.send(b'No such service')
+    #except ConnectionResetError:
+     #   print('Client connection is refused')
+        # TODO: delete listener from list
 
 
 def DispatchServer(conn: socket, addr, username):
